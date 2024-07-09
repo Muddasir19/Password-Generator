@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import "./App.css";
 
 function App() {
@@ -7,6 +7,8 @@ function App() {
   const [character, setCharacter] = useState(false);
 
   const [password, setPassword] = useState("Password");
+
+  const passwordRef = useRef(null)
 
   // useCallBack
   const passwordGenerator = useCallback(() => {
@@ -24,6 +26,13 @@ function App() {
     setPassword(pass);
   }, [length, number, character]);
 
+  const copyPassword = useCallback (()=>{
+    passwordRef.current?.select()
+    passwordRef.current?.setSelectionRange(0, 30);
+    window.navigator.clipboard.writeText(password)
+  },[password])
+
+
   useEffect( ()=>{
     
     passwordGenerator()
@@ -32,35 +41,39 @@ function App() {
   return (
     <>
       <div className="bg-black max-w-lg w-full mx-auto rounded-lg p-4 my-8  text-white ">
-        <h1 className=" font-bold underline text-4xl ">Password Generator</h1>
+        <h1 className=" font-bold  text-4xl ">Auto Password Generator</h1>
         <div className="flex m-3 ">
           <input
-            className="text-red-700 w-full py-1 px-3 outline-none rounded-s-lg"
+            className="text-red-700 w-full py-1 px-3 outline-none rounded-s-lg cursor-not-allowed"
             type="text"
             placeholder="Password"
             readOnly
             value={password}
+            ref={passwordRef}
           />
-          <button className="bg-blue-700 px-5 p-2 outline-none shrink-0 rounded-e-lg">
+          <button className="bg-blue-700 px-5 p-2 outline-none shrink-0 rounded-e-lg hover:bg-blue-800 hover:text-red-600 "
+          onClick={copyPassword}>
             Copy
           </button>
         </div>
 
         <div className="flex text-sm gap-x-4 px-3" >
           <div className="flex gap-x-2" >
-          <label htmlFor="">Length:{length} </label>
+          <label htmlFor="length" className="hover:text-red-600">Length:{length} </label>
             <input type="range"
+            id="length"
             min={8}
             max={30}
             value={length}
             onChange={(e)=> {setLength(e.target.value)}}
-            className="cursor-pointer"
+            className="cursor-pointer "
              />
           </div>
 
           <div className="flex gap-x-2">
-          <label htmlFor="">Numbers </label>
-            <input type="checkbox"
+          <label htmlFor="number" className="hover:text-red-600">Numbers </label>
+            <input  type="checkbox"
+            id="number"
             defaultChecked={number}
             onChange={ 
               ()=> setNumber((prev) => !prev) 
@@ -69,8 +82,9 @@ function App() {
           </div>
 
           <div className="flex gap-x-2">
-          <label htmlFor="">Characters </label>
+          <label htmlFor="character"className="hover:text-red-600" >Characters </label>
             <input type="checkbox"
+            id="character"
             defaultChecked={character}
 
             onChange={ 
